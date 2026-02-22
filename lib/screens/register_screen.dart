@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/local_storage_service.dart';
-import 'verify_email_screen.dart';
+import '../services/api_service.dart';
+import 'main_shell.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -81,23 +81,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    await LocalStorageService.saveUser(
-      username: username,
-      email: email,
-      password: password,
-    );
+    final result = await ApiService().register(username, email, password);
 
     if (!mounted) return;
 
-    setState(() {
-      _isLoading = false;
-    });
+    if (!result.success) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = result.error ?? 'Registration failed. Please try again.';
+      });
+      return;
+    }
 
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(
-        builder: (_) => VerifyEmailScreen(email: email),
-      ),
+      MaterialPageRoute(builder: (_) => const MainShell()),
+      (route) => false,
     );
   }
 

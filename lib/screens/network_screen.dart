@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/mock_data.dart';
+import '../services/api_service.dart';
 import '../models/network_node_model.dart';
 
 class NetworkScreen extends StatefulWidget {
@@ -13,6 +13,23 @@ class NetworkScreen extends StatefulWidget {
 class _NetworkScreenState extends State<NetworkScreen> {
   String? _selectedNodeId;
   final TransformationController _transformController = TransformationController();
+  List<NetworkNodeModel> _nodes = [];
+  bool _isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadNodes();
+  }
+
+  Future<void> _loadNodes() async {
+    final nodes = await ApiService().getNetworkPeers();
+    if (!mounted) return;
+    setState(() {
+      _nodes = nodes;
+      _isLoading = false;
+    });
+  }
 
   @override
   void dispose() {
@@ -27,8 +44,16 @@ class _NetworkScreenState extends State<NetworkScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (_nodes.isEmpty) {
+      return const Center(child: Text('No network peers yet', style: TextStyle(color: AppTheme.textMuted)));
+    }
+
     final selectedNode = _selectedNodeId != null
-        ? MockData.networkNodes.firstWhere((n) => n.id == _selectedNodeId)
+        ? _nodes.firstWhere((n) => n.id == _selectedNodeId, orElse: () => _nodes.first)
         : null;
 
     return Stack(
@@ -46,11 +71,11 @@ class _NetworkScreenState extends State<NetworkScreen> {
               builder: (context, constraints) {
                 return CustomPaint(
                   painter: _NetworkPainter(
-                    nodes: MockData.networkNodes,
+                    nodes: _nodes,
                     size: Size(constraints.maxWidth, constraints.maxHeight),
                   ),
                   child: Stack(
-                    children: MockData.networkNodes.map((node) {
+                    children: _nodes.map((node) {
                       final x = node.x * constraints.maxWidth;
                       final y = node.y * constraints.maxHeight;
                       final isYou = node.id == 'you';
@@ -268,7 +293,9 @@ class _NetworkPainter extends CustomPainter {
       ..strokeWidth = 1.0
       ..style = PaintingStyle.stroke;
 
-    final youNode = nodes.firstWhere((n) => n.id == 'you');
+    final youIdx = nodes.indexWhere((n) => n.id == 'you');
+    if (youIdx == -1) return;
+    final youNode = nodes[youIdx];
     final youPos = Offset(youNode.x * size.width, youNode.y * size.height);
 
     for (final node in nodes) {

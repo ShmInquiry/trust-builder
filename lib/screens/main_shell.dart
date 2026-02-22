@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/mock_data.dart';
+import '../services/api_service.dart';
 import 'home_screen.dart';
 import 'network_screen.dart';
 import 'roster_screen.dart';
 import 'alerts_screen.dart';
 import 'settings_screen.dart';
+import 'login_screen.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -16,6 +17,8 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentIndex = 0;
+  int _trustScore = 0;
+  String _trustStatus = '...';
 
   static const _titles = ['Trust\nDashboard', 'Network Map', 'Roster', 'Alerts'];
 
@@ -25,6 +28,45 @@ class _MainShellState extends State<MainShell> {
     RosterScreen(),
     AlertsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTrustScore();
+  }
+
+  Future<void> _loadTrustScore() async {
+    final result = await ApiService().getTrustScore();
+    if (!mounted) return;
+    if (result != null) {
+      setState(() {
+        _trustScore = result.score;
+        _trustStatus = result.status;
+      });
+    }
+  }
+
+  Color get _trustStatusColor {
+    switch (_trustStatus.toLowerCase()) {
+      case 'healthy':
+        return AppTheme.statusHealthy;
+      case 'fair':
+        return AppTheme.statusStalled;
+      case 'critical':
+        return AppTheme.statusCritical;
+      default:
+        return AppTheme.textMuted;
+    }
+  }
+
+  void _logout() {
+    ApiService().logout();
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const LoginScreen()),
+      (route) => false,
+    );
+  }
 
   PreferredSizeWidget _buildAppBar() {
     switch (_currentIndex) {
@@ -69,13 +111,13 @@ class _MainShellState extends State<MainShell> {
               margin: const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: AppTheme.statusHealthy.withValues(alpha: 0.12),
+                color: _trustStatusColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                'EB: ${MockData.trustScore} \u00b7 ${MockData.trustStatus}',
-                style: const TextStyle(
-                  color: AppTheme.statusHealthy,
+                'EB: $_trustScore \u00b7 $_trustStatus',
+                style: TextStyle(
+                  color: _trustStatusColor,
                   fontSize: 13,
                   fontWeight: FontWeight.w600,
                 ),
@@ -190,9 +232,9 @@ class _MainShellState extends State<MainShell> {
                       style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: AppTheme.textDark),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
-                      'Build trust, one interaction at a time.',
-                      style: TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                    Text(
+                      ApiService().username ?? 'Build trust, one interaction at a time.',
+                      style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
                     ),
                   ],
                 ),
@@ -239,6 +281,14 @@ class _MainShellState extends State<MainShell> {
                     context,
                     MaterialPageRoute(builder: (_) => const SettingsScreen()),
                   );
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.logout,
+                label: 'Sign Out',
+                onTap: () {
+                  Navigator.pop(context);
+                  _logout();
                 },
               ),
               const Spacer(),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/local_storage_service.dart';
+import '../services/api_service.dart';
 import 'register_screen.dart';
 import 'main_shell.dart';
 
@@ -63,31 +63,17 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
     final password = _passwordController.text;
 
-    final hasUser = await LocalStorageService.hasRegisteredUser();
-    if (!hasUser) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'No account found. Please sign up first.';
-      });
-      return;
-    }
-
-    final isValid = await LocalStorageService.validateLogin(
-      email: email,
-      password: password,
-    );
-
-    if (!isValid) {
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Invalid email or password. Please try again.';
-      });
-      return;
-    }
-
-    await LocalStorageService.setLoggedIn(true);
+    final result = await ApiService().login(email, password);
 
     if (!mounted) return;
+
+    if (!result.success) {
+      setState(() {
+        _isLoading = false;
+        _errorMessage = result.error ?? 'Invalid email or password. Please try again.';
+      });
+      return;
+    }
 
     Navigator.pushReplacement(
       context,
@@ -202,7 +188,15 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Text(
+                    'Demo: demo@trustos.app / demo1234',
+                    style: TextStyle(fontSize: 12, color: AppTheme.textMuted.withValues(alpha: 0.7)),
+                  ),
+                ),
+                const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _login,
                   child: _isLoading

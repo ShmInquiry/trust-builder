@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/alert_model.dart';
-import '../services/mock_data.dart';
+import '../services/api_service.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -12,17 +12,24 @@ class AlertsScreen extends StatefulWidget {
 
 class _AlertsScreenState extends State<AlertsScreen> {
   String _selectedFilter = 'All';
+  List<AlertModel> _alerts = [];
+  bool _isLoading = true;
 
-  List<AlertModel> get _filteredAlerts {
-    if (_selectedFilter == 'All') return MockData.alerts;
-    if (_selectedFilter == 'Requests') {
-      return MockData.alerts
-          .where((a) => a.type != AlertType.system)
-          .toList();
-    }
-    return MockData.alerts
-        .where((a) => a.type == AlertType.system)
-        .toList();
+  @override
+  void initState() {
+    super.initState();
+    _loadAlerts();
+  }
+
+  Future<void> _loadAlerts() async {
+    setState(() => _isLoading = true);
+    final filter = _selectedFilter == 'All' ? null : _selectedFilter;
+    final alerts = await ApiService().getAlerts(filter: filter);
+    if (!mounted) return;
+    setState(() {
+      _alerts = alerts;
+      _isLoading = false;
+    });
   }
 
   @override
@@ -45,7 +52,10 @@ class _AlertsScreenState extends State<AlertsScreen> {
               return Padding(
                 padding: const EdgeInsets.only(right: 8),
                 child: GestureDetector(
-                  onTap: () => setState(() => _selectedFilter = filter),
+                  onTap: () {
+                    setState(() => _selectedFilter = filter);
+                    _loadAlerts();
+                  },
                   child: Container(
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                     decoration: BoxDecoration(
@@ -71,13 +81,20 @@ class _AlertsScreenState extends State<AlertsScreen> {
         ),
         const SizedBox(height: 12),
         Expanded(
-          child: ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            itemCount: _filteredAlerts.length,
-            itemBuilder: (context, index) {
-              return _AlertCard(alert: _filteredAlerts[index]);
-            },
-          ),
+          child: _isLoading
+              ? const Center(child: CircularProgressIndicator())
+              : _alerts.isEmpty
+                  ? const Center(child: Text('No alerts', style: TextStyle(color: AppTheme.textMuted)))
+                  : RefreshIndicator(
+                      onRefresh: _loadAlerts,
+                      child: ListView.builder(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: _alerts.length,
+                        itemBuilder: (context, index) {
+                          return _AlertCard(alert: _alerts[index]);
+                        },
+                      ),
+                    ),
         ),
       ],
     );
@@ -138,9 +155,9 @@ class _AlertCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 1),
       padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(
+      decoration: BoxDecoration(
+        color: alert.isRead ? Colors.white : Colors.white,
+        border: const Border(
           bottom: BorderSide(color: AppTheme.borderLight, width: 1),
         ),
       ),

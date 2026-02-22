@@ -18,17 +18,32 @@ author = "agent"
 task = "workflow.run"
 args = "Flutter Web App"
 
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Rust Backend"
+
 [[workflows.workflow]]
 name = "Flutter Web App"
 author = "agent"
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
 args = "cd /home/runner/workspace && flutter build web --release 2>&1 && dart run serve_web.dart"
 waitForPort = 5000
 
+[[workflows.workflow]]
+name = "Rust Backend"
+author = "agent"
+
 [workflows.workflow.metadata]
-outputType = "webview"
+outputType = "console"
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "cd /home/runner/workspace/backend && cargo build 2>&1 && cargo run 2>&1"
 
 [[ports]]
 localPort = 5000
