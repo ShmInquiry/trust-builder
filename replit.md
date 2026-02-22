@@ -23,25 +23,28 @@ lib/
     network_node_model.dart - Network peer node model
   services/
     mock_data.dart       - Mock data for all screens
+    local_storage_service.dart - SharedPreferences wrapper for user auth
   screens/
-    login_screen.dart    - Email/password login
-    register_screen.dart - Account registration (username, email, password)
+    login_screen.dart    - Email/password login with validation
+    register_screen.dart - Account registration with validation (username, email, password)
     verify_email_screen.dart - 6-digit email verification
-    main_shell.dart      - Main app shell with bottom nav + drawer
+    main_shell.dart      - Main app shell with bottom nav + drawer + logo
     home_screen.dart     - Dashboard: Trust Score, Covey quote, active requests
     network_screen.dart  - Interactive network node map with zoom/pan
     roster_screen.dart   - List view of network peers
     alerts_screen.dart   - Filterable alerts (All/Requests/System)
     settings_screen.dart - Profile editing, privacy toggles, app settings
+    request_detail_screen.dart - Full request detail view with back navigation
   widgets/
-    request_card.dart    - Active request card with status dot
+    request_card.dart    - Tappable request card with status dot and navigation
 ```
 
 ## Navigation Flow
-- Login Screen -> Main Shell (after auth)
-- Register Screen -> Verify Email -> Main Shell
+- Login Screen -> Main Shell (validates against stored credentials)
+- Register Screen -> stores user in local storage -> Verify Email -> Main Shell
 - Main Shell: Bottom nav (Home, Network, Roster, Alerts) + Hamburger drawer menu
 - Drawer: Navigate to tabs or Profile & Settings screen
+- Home -> Tap request card -> Request Detail Screen -> Back button returns to Home
 
 ## Running the App
 The workflow builds and serves the Flutter web app:
@@ -55,11 +58,16 @@ The workflow builds and serves the Flutter web app:
 - Color-coded request statuses: Blue (Fair), Yellow (Stalled), Red (Critical)
 - Trust Score badge in Home AppBar showing EB points and health status
 
+## Dependencies
+- `shared_preferences` - Local storage for user authentication credentials
+
 ## Recent Changes
+- 2026-02-22: Phase 1 complete - Added form validation, local storage auth, logo, detail screen
+- 2026-02-22: Login validation (email regex, password required, error banners)
+- 2026-02-22: Signup validation (username 3+ chars, email format, password 8+ with number)
+- 2026-02-22: LocalStorageService saves/validates user credentials via SharedPreferences
+- 2026-02-22: App logo added to Home screen AppBar header
+- 2026-02-22: RequestDetailScreen with full info, peer list, action buttons, back nav
+- 2026-02-22: Request cards now tappable, navigating to detail screen
 - 2026-02-22: Built complete Trust OS app with all core screens
-- 2026-02-22: Login, Registration, Email Verification screens
-- 2026-02-22: Home Dashboard with Covey quotes, Trust Score, active requests
-- 2026-02-22: Network Map with InteractiveViewer and node visualization
-- 2026-02-22: Alerts screen with filter tabs and typed alert cards
-- 2026-02-22: Settings screen with profile editing and privacy toggles
 - 2026-02-22: Drawer menu and bottom navigation wired up
