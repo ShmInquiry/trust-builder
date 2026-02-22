@@ -36,9 +36,33 @@ class _MainShellState extends State<MainShell> {
               onPressed: () => Scaffold.of(context).openDrawer(),
             ),
           ),
-          title: Text(
-            _titles[0],
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.2),
+          title: Row(
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.asset(
+                  'assets/images/trust_os_logo.png',
+                  width: 32,
+                  height: 32,
+                  errorBuilder: (_, __, ___) => Container(
+                    width: 32,
+                    height: 32,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryBlue,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Center(
+                      child: Text('TO', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                _titles[0],
+                style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w700, height: 1.2),
+              ),
+            ],
           ),
           actions: [
             Container(
