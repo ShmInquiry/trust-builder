@@ -1,25 +1,21 @@
 import 'package:flutter/material.dart';
+import 'theme/app_theme.dart';
+import 'screens/login_screen.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const TrustOSApp());
 }
 
-class MyApp extends StatelessWidget {
+class TrustOSApp extends StatelessWidget {
+  const TrustOSApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: AppBar(
-          title: Text('I am Fucking Poor!'),
-          backgroundColor: Colors.blueGrey,
-        ),
-        body: Center(
-          child: Image(
-            image: AssetImage('assets/images/ProfilePic.jpg'),
-          ),
-        ),
-      ),
+      title: 'Trust OS',
+      debugShowCheckedModeBanner: false,
+      theme: AppTheme.lightTheme,
+      home: const LoginScreen(),
     );
   }
 }
