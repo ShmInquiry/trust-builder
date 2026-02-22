@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
+import '../services/local_storage_service.dart';
 import 'main_shell.dart';
 
 class VerifyEmailScreen extends StatefulWidget {
@@ -21,7 +22,9 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
     }
   }
 
-  void _confirm() {
+  Future<void> _confirm() async {
+    await LocalStorageService.setLoggedIn(true);
+    if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const MainShell()),
@@ -128,15 +131,24 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
                 }),
               ),
               const SizedBox(height: 12),
-              const Row(
-                children: [
-                  Icon(Icons.access_time, size: 14, color: AppTheme.textMuted),
-                  SizedBox(width: 4),
-                  Text(
-                    'Code expires in 08:24',
-                    style: TextStyle(color: AppTheme.textMuted, fontSize: 13),
-                  ),
-                ],
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                decoration: BoxDecoration(
+                  color: AppTheme.primaryBlue.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.info_outline, size: 16, color: AppTheme.primaryBlue),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        'Demo mode: Enter any 6 digits or just tap "Confirm" to continue.',
+                        style: TextStyle(color: AppTheme.primaryBlue, fontSize: 13),
+                      ),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 20),
               Row(
