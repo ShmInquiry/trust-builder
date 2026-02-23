@@ -108,6 +108,9 @@ The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 - `regex` - Email validation
 
 ## Recent Changes
+- 2026-02-23: Added CreateRequestScreen with title, description, urgency picker, and peer assignment
+- 2026-02-23: FAB and "Clarify Expectations" button on Home screen navigate to create request form
+- 2026-02-23: Backend supports initial status on request creation (fair/stalled/critical)
 - 2026-02-22: Phase 2 complete - Rust backend with full REST API
 - 2026-02-22: API proxy in serve_web.dart forwards /api/* to Rust backend
 - 2026-02-22: Created ApiService singleton for Flutter API integration

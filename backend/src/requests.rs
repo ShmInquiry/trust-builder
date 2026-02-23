@@ -118,13 +118,18 @@ pub async fn create_request(
 
     let request_id = Uuid::new_v4();
 
+    let status = body.status.as_deref().unwrap_or("fair");
+    let valid_statuses = ["fair", "stalled", "critical"];
+    let status = if valid_statuses.contains(&status) { status } else { "fair" };
+
     let result = sqlx::query_as::<_, Request>(
-        "INSERT INTO requests (id, user_id, title, description, document_id) VALUES ($1, $2, $3, $4, $5) RETURNING *"
+        "INSERT INTO requests (id, user_id, title, description, status, document_id) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *"
     )
     .bind(request_id)
     .bind(user_id)
     .bind(body.title.trim())
     .bind(&body.description)
+    .bind(status)
     .bind(&body.document_id)
     .fetch_one(pool.get_ref())
     .await;

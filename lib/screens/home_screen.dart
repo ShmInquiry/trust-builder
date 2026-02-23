@@ -4,6 +4,7 @@ import '../services/api_service.dart';
 import '../services/mock_data.dart';
 import '../models/request_model.dart';
 import '../widgets/request_card.dart';
+import 'create_request_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -31,6 +32,15 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  Future<void> _openCreateRequest() async {
+    final result = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(builder: (_) => const CreateRequestScreen()),
+    );
+    if (result == true) {
+      _loadRequests();
+    }
+  }
+
   String _getDailyQuote() {
     final dayOfYear = DateTime.now().difference(DateTime(DateTime.now().year)).inDays;
     return MockData.coveyQuotes[dayOfYear % MockData.coveyQuotes.length];
@@ -38,11 +48,18 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _loadRequests,
-      child: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      floatingActionButton: FloatingActionButton(
+        onPressed: _openCreateRequest,
+        backgroundColor: AppTheme.primaryBlue,
+        child: const Icon(Icons.add, color: Colors.white),
+      ),
+      body: RefreshIndicator(
+        onRefresh: _loadRequests,
+        child: ListView(
+          padding: const EdgeInsets.all(16),
+          children: [
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -86,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: _openCreateRequest,
               icon: const Icon(Icons.add),
               label: const Text('Clarify Expectations'),
             ),
@@ -128,7 +145,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.only(bottom: 1),
                   child: RequestCard(request: req),
                 )),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -219,13 +219,15 @@ class ApiService {
   Future<({bool success, String? error})> createRequest({
     required String title,
     required String description,
+    String? status,
     List<String>? peers,
     String? documentId,
   }) async {
     final result = await _request('POST', '/api/requests', body: {
       'title': title,
       'description': description,
-      if (peers != null) 'peers': peers,
+      if (status != null) 'status': status,
+      if (peers != null && peers.isNotEmpty) 'peers': peers,
       if (documentId != null) 'document_id': documentId,
     });
 

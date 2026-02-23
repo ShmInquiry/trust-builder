@@ -67,6 +67,7 @@ pub struct Request {
 pub struct CreateRequestBody {
     pub title: String,
     pub description: String,
+    pub status: Option<String>,
     pub peers: Option<Vec<String>>,
     pub document_id: Option<String>,
 }
