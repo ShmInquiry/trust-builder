@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import '../models/request_model.dart';
 import '../models/alert_model.dart';
 import '../models/network_node_model.dart';
+import 'local_storage_service.dart';
 
 class ApiService {
   static final ApiService _instance = ApiService._internal();
@@ -80,6 +81,16 @@ class ApiService {
     }
   }
 
+  Future<bool> restoreSession() async {
+    final session = await LocalStorageService.getSavedSession();
+    if (session == null) return false;
+    _token = session['token'];
+    _userId = session['userId'];
+    _username = session['username'];
+    _email = session['email'];
+    return true;
+  }
+
   Future<({bool success, String? error})> login(String email, String password) async {
     final result = await _request('POST', '/api/auth/login', body: {
       'email': email,
@@ -92,6 +103,12 @@ class ApiService {
       _userId = data['user']['id'];
       _username = data['user']['username'];
       _email = data['user']['email'];
+      await LocalStorageService.saveSession(
+        token: _token!,
+        userId: _userId!,
+        username: _username ?? '',
+        email: _email ?? '',
+      );
       return (success: true, error: null);
     }
 
@@ -111,17 +128,29 @@ class ApiService {
       _userId = data['user']['id'];
       _username = data['user']['username'];
       _email = data['user']['email'];
+      await LocalStorageService.saveSession(
+        token: _token!,
+        userId: _userId!,
+        username: _username ?? '',
+        email: _email ?? '',
+      );
+      await LocalStorageService.saveUser(
+        username: username,
+        email: email,
+        password: password,
+      );
       return (success: true, error: null);
     }
 
     return (success: false, error: result['error'] as String? ?? 'Registration failed');
   }
 
-  void logout() {
+  Future<void> logout() async {
     _token = null;
     _userId = null;
     _username = null;
     _email = null;
+    await LocalStorageService.logout();
   }
 
   Future<({int score, String status})?> getTrustScore() async {

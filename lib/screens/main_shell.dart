@@ -59,8 +59,9 @@ class _MainShellState extends State<MainShell> {
     }
   }
 
-  void _logout() {
-    ApiService().logout();
+  void _logout() async {
+    await ApiService().logout();
+    if (!mounted) return;
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const LoginScreen()),

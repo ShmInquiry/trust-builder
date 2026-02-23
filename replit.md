@@ -107,7 +107,16 @@ The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 - `serde` + `serde_json` - JSON serialization
 - `regex` - Email validation
 
+## Evidence Screenshots
+- `module-2-wireframe-design-mockups/login_screen_evidence.png` - Login screen with form validation
+- `module-2-wireframe-design-mockups/signup_screen_evidence.png` - Signup/register screen with validation
+- `module-2-wireframe-design-mockups/home-screen-evidence.png` - Home dashboard with trust score, requests
+- `module-2-wireframe-design-mockups/evidence-detail-navigation.jpg` - Navigation evidence
+
 ## Recent Changes
+- 2026-02-23: Added local storage (SharedPreferences) for persisting user session and details
+- 2026-02-23: ApiService now saves/restores session to/from local storage on login/register/logout
+- 2026-02-23: Created module-2-wireframe-design-mockups/ folder with evidence screenshots
 - 2026-02-23: Added CreateRequestScreen with title, description, urgency picker, and peer assignment
 - 2026-02-23: FAB and "Clarify Expectations" button on Home screen navigate to create request form
 - 2026-02-23: Backend supports initial status on request creation (fair/stalled/critical)
