@@ -13,6 +13,19 @@ Future<void> main() async {
       continue;
     }
 
+    if (path == '/flutter_service_worker.js') {
+      request.response.headers.set('Content-Type', 'application/javascript');
+      request.response.headers.set('Cache-Control', 'no-cache');
+      request.response.write('''
+self.addEventListener('install', function(e) { self.skipWaiting(); });
+self.addEventListener('activate', function(e) {
+  self.registration.unregister();
+});
+''');
+      await request.response.close();
+      continue;
+    }
+
     if (path == '/') path = '/index.html';
 
     final file = File('build/web$path');

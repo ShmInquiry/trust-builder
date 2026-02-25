@@ -24,8 +24,10 @@ lib/
     network_node_model.dart - Network peer node model (with fromJson)
   services/
     api_service.dart     - Singleton API client (auth, requests, trust, network, alerts)
+    notification_service.dart - Notification preferences & web notification delivery
+    notification_service_web.dart - Web Notifications API bridge (dart:js_interop)
     mock_data.dart       - Covey quotes (static content)
-    local_storage_service.dart - SharedPreferences wrapper (legacy, kept for reference)
+    local_storage_service.dart - SharedPreferences wrapper for session persistence
   screens/
     login_screen.dart    - Email/password login via API
     register_screen.dart - Account registration via API
@@ -35,6 +37,7 @@ lib/
     network_screen.dart  - Interactive network node map from API data
     roster_screen.dart   - List view of network peers from API
     alerts_screen.dart   - Filterable alerts from API (All/Requests/System)
+    notifications_screen.dart - Notification settings: enable/disable, task filters, time picker, test
     settings_screen.dart - Profile editing, privacy toggles, app settings
     request_detail_screen.dart - Full request detail view with back navigation
   widgets/
@@ -70,13 +73,13 @@ backend/
 - Login Screen -> API auth -> Main Shell
 - Register Screen -> API register -> Main Shell
 - Main Shell: Bottom nav (Home, Network, Roster, Alerts) + Hamburger drawer menu
-- Drawer: Navigate to tabs, Profile & Settings, or Sign Out
+- Drawer: Navigate to tabs, Notifications, Profile & Settings, or Sign Out
 - Home -> Tap request card -> Request Detail Screen -> Back button returns to Home
 
 ## Running the App
 Two workflows run simultaneously:
 1. **Rust Backend**: `cargo build && cargo run` on port 3001 (API server)
-2. **Flutter Web App**: `flutter build web --release && dart run serve_web.dart` on port 5000
+2. **Flutter Web App**: `flutter build web --release --pwa-strategy=none && dart run serve_web.dart` on port 5000
 
 The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 
@@ -96,7 +99,8 @@ The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 ## Dependencies
 ### Flutter
 - `http` - HTTP client for API calls
-- `shared_preferences` - Local storage (legacy)
+- `shared_preferences` - Local storage for session & notification preferences
+- `flutter_local_notifications` - Notification support (web uses Web Notifications API)
 - `cupertino_icons` - iOS-style icons
 
 ### Rust Backend
@@ -114,6 +118,10 @@ The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 - `module-2-wireframe-design-mockups/evidence-detail-navigation.jpg` - Navigation evidence
 
 ## Recent Changes
+- 2026-02-25: Added NotificationsScreen with enable/disable toggle, task type filters, time picker, test notification button
+- 2026-02-25: Created NotificationService with Web Notifications API support and SharedPreferences persistence
+- 2026-02-25: Added "Notifications" item to drawer menu in MainShell
+- 2026-02-25: Disabled PWA service worker (--pwa-strategy=none) to prevent caching issues
 - 2026-02-23: Added local storage (SharedPreferences) for persisting user session and details
 - 2026-02-23: ApiService now saves/restores session to/from local storage on login/register/logout
 - 2026-02-23: Created module-2-wireframe-design-mockups/ folder with evidence screenshots

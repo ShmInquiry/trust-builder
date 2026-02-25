@@ -31,7 +31,7 @@ outputType = "webview"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = "cd /home/runner/workspace && flutter build web --release 2>&1 && dart run serve_web.dart"
+args = "cd /home/runner/workspace && flutter build web --release --pwa-strategy=none 2>&1 && dart run serve_web.dart"
 waitForPort = 5000
 
 [[workflows.workflow]]

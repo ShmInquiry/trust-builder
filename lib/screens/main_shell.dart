@@ -6,6 +6,7 @@ import 'network_screen.dart';
 import 'roster_screen.dart';
 import 'alerts_screen.dart';
 import 'settings_screen.dart';
+import 'notifications_screen.dart';
 import 'login_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -270,6 +271,17 @@ class _MainShellState extends State<MainShell> {
                 onTap: () {
                   setState(() => _currentIndex = 3);
                   Navigator.pop(context);
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.notifications_active_outlined,
+                label: 'Notifications',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+                  );
                 },
               ),
               const Divider(height: 1),
