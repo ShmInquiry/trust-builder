@@ -39,6 +39,9 @@ lib/
     alerts_screen.dart   - Filterable alerts from API (All/Requests/System)
     notifications_screen.dart - Notification settings: enable/disable, task filters, time picker, test
     settings_screen.dart - Profile editing, privacy toggles, app settings
+    configure_screen.dart - App configuration: privacy toggles, dark mode, notifications toggle
+    personal_info_screen.dart - Profile editing: name, email, title/department
+    reports_screen.dart  - Trust reports: score summary, request breakdown, network size
     request_detail_screen.dart - Full request detail view with back navigation
   widgets/
     request_card.dart    - Tappable request card with status dot and navigation
@@ -73,7 +76,7 @@ backend/
 - Login Screen -> API auth -> Main Shell
 - Register Screen -> API register -> Main Shell
 - Main Shell: Bottom nav (Home, Network, Roster, Alerts) + Hamburger drawer menu
-- Drawer: Navigate to tabs, Notifications, Profile & Settings, or Sign Out
+- Drawer: Navigate to tabs (Home, Network, Roster, Alerts), Configure, Personal Info, Reports, Notifications, or Sign Out
 - Home -> Tap request card -> Request Detail Screen -> Back button returns to Home
 
 ## Running the App
@@ -118,6 +121,8 @@ The Dart web server proxies `/api/*` requests to the Rust backend on port 3001.
 - `module-2-wireframe-design-mockups/evidence-detail-navigation.jpg` - Navigation evidence
 
 ## Recent Changes
+- 2026-03-01: Added Configure, Personal Info, and Reports screens to drawer menu
+- 2026-03-01: Drawer menu now has: Home, Network, Roster, Alerts | Configure, Personal Info, Reports, Notifications, Sign Out
 - 2026-02-25: Added NotificationsScreen with enable/disable toggle, task type filters, time picker, test notification button
 - 2026-02-25: Created NotificationService with Web Notifications API support and SharedPreferences persistence
 - 2026-02-25: Added "Notifications" item to drawer menu in MainShell

@@ -7,6 +7,9 @@ import 'roster_screen.dart';
 import 'alerts_screen.dart';
 import 'settings_screen.dart';
 import 'notifications_screen.dart';
+import 'configure_screen.dart';
+import 'personal_info_screen.dart';
+import 'reports_screen.dart';
 import 'login_screen.dart';
 
 class MainShell extends StatefulWidget {
@@ -273,6 +276,40 @@ class _MainShellState extends State<MainShell> {
                   Navigator.pop(context);
                 },
               ),
+              const Divider(height: 1),
+              _DrawerItem(
+                icon: Icons.settings_outlined,
+                label: 'Configure',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ConfigureScreen()),
+                  );
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.person_outline,
+                label: 'Personal Info',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const PersonalInfoScreen()),
+                  );
+                },
+              ),
+              _DrawerItem(
+                icon: Icons.bar_chart_outlined,
+                label: 'Reports',
+                onTap: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ReportsScreen()),
+                  );
+                },
+              ),
               _DrawerItem(
                 icon: Icons.notifications_active_outlined,
                 label: 'Notifications',
@@ -281,18 +318,6 @@ class _MainShellState extends State<MainShell> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(builder: (_) => const NotificationsScreen()),
-                  );
-                },
-              ),
-              const Divider(height: 1),
-              _DrawerItem(
-                icon: Icons.person_outline,
-                label: 'Profile & Settings',
-                onTap: () {
-                  Navigator.pop(context);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (_) => const SettingsScreen()),
                   );
                 },
               ),
