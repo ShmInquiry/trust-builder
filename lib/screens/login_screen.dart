@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'register_screen.dart';
 import 'main_shell.dart';
 
@@ -31,10 +31,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return 'Email is required';
     }
     final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address';
+    if (emailRegex.hasMatch(value.trim())) {
+      return null;
     }
-    return null;
+    return 'Please enter a valid email address';
   }
 
   String? _validatePassword(String? value) {
@@ -52,33 +52,30 @@ class _LoginScreenState extends State<LoginScreen> {
       _errorMessage = null;
     });
 
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    final result = await ApiService().login(email, password);
-
-    if (!mounted) return;
-
-    if (!result.success) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
-        _errorMessage = result.error ?? 'Invalid email or password. Please try again.';
+        _isLoading = true;
       });
-      return;
-    }
 
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(builder: (_) => const MainShell()),
-    );
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      final result = await AuthService().login(email, password);
+
+      if (mounted) {
+        if (result.success) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const MainShell()),
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = result.error ?? 'Invalid email or password. Please try again.';
+          });
+        }
+      }
+    }
   }
 
   @override

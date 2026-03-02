@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -10,8 +10,8 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  final _nameController = TextEditingController(text: ApiService().username ?? 'User');
-  final _titleController = TextEditingController(text: ApiService().email ?? '');
+  final _nameController = TextEditingController(text: AuthService().username ?? 'User');
+  final _titleController = TextEditingController(text: AuthService().email ?? '');
   bool _profilePublic = true;
   bool _showTrustCounter = true;
   bool _syncContacts = false;

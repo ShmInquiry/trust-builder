@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/trust_score_service.dart';
+import '../services/auth_service.dart';
 import 'home_screen.dart';
 import 'network_screen.dart';
 import 'roster_screen.dart';
@@ -40,13 +41,14 @@ class _MainShellState extends State<MainShell> {
   }
 
   Future<void> _loadTrustScore() async {
-    final result = await ApiService().getTrustScore();
-    if (!mounted) return;
-    if (result != null) {
-      setState(() {
-        _trustScore = result.score;
-        _trustStatus = result.status;
-      });
+    final result = await TrustScoreService().getTrustScore();
+    if (mounted) {
+      if (result != null) {
+        setState(() {
+          _trustScore = result.score;
+          _trustStatus = result.status;
+        });
+      }
     }
   }
 
@@ -64,13 +66,14 @@ class _MainShellState extends State<MainShell> {
   }
 
   void _logout() async {
-    await ApiService().logout();
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const LoginScreen()),
-      (route) => false,
-    );
+    await AuthService().logout();
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const LoginScreen()),
+        (route) => false,
+      );
+    }
   }
 
   PreferredSizeWidget _buildAppBar() {
@@ -238,7 +241,7 @@ class _MainShellState extends State<MainShell> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      ApiService().username ?? 'Build trust, one interaction at a time.',
+                      AuthService().username ?? 'Build trust, one interaction at a time.',
                       style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
                     ),
                   ],

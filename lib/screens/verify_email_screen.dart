@@ -24,12 +24,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   Future<void> _confirm() async {
     await LocalStorageService.setLoggedIn(true);
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainShell()),
-      (route) => false,
-    );
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainShell()),
+        (route) => false,
+      );
+    }
   }
 
   @override

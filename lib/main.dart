@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'theme/app_theme.dart';
 import 'screens/login_screen.dart';
 import 'screens/main_shell.dart';
-import 'services/api_service.dart';
+import 'services/auth_service.dart';
 import 'services/notification_service.dart';
 
 void main() async {
@@ -28,7 +28,7 @@ class _TrustOSAppState extends State<TrustOSApp> {
   }
 
   Future<void> _initSession() async {
-    final restored = await ApiService().restoreSession();
+    final restored = await AuthService().restoreSession();
     setState(() {
       _home = restored ? const MainShell() : const LoginScreen();
     });

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 
 class PersonalInfoScreen extends StatefulWidget {
   const PersonalInfoScreen({super.key});
@@ -10,8 +10,9 @@ class PersonalInfoScreen extends StatefulWidget {
 }
 
 class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
-  final _nameController = TextEditingController(text: ApiService().username ?? 'User');
-  final _emailController = TextEditingController(text: ApiService().email ?? '');
+  final _nameController = TextEditingController(text: AuthService().username ?? 'User');
+  final _emailController = TextEditingController(text: AuthService().email ?? '');
+  final _formKey = GlobalKey<FormState>();
   final _titleController = TextEditingController();
 
   @override
@@ -48,11 +49,22 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                       shape: BoxShape.circle,
                       color: AppTheme.primaryBlue.withValues(alpha: 0.1),
                     ),
-                    child: const Icon(Icons.person, size: 40, color: AppTheme.primaryBlue),
+                    child: Center(
+                      child: Text(
+                        AuthService().username != null && AuthService().username!.isNotEmpty
+                            ? AuthService().username![0].toUpperCase()
+                            : 'U',
+                        style: const TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.w700,
+                          color: AppTheme.primaryBlue,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    ApiService().username ?? 'User',
+                    AuthService().username ?? 'User',
                     style: const TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w700,
@@ -61,7 +73,7 @@ class _PersonalInfoScreenState extends State<PersonalInfoScreen> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    ApiService().email ?? '',
+                    AuthService().email ?? '',
                     style: const TextStyle(fontSize: 14, color: AppTheme.textMuted),
                   ),
                 ],
