@@ -44,6 +44,24 @@ This project is a full-stack application leveraging the following technologies:
 - **Database**: PostgreSQL
 - **Development Environment Setup**: Built explicitly to run with a custom Dart HTTP Server acting as a request proxy to avoid web CORS and CanvasKit loading issues.
 
+## Project Structure
+
+```text
+trust-builder/
+├── lib/                             # Flutter Frontend Code
+│   ├── main.dart                    # Application entry point
+│   ├── models/                      # Dart Models (Request, Alert, NetworkNode)
+│   ├── screens/                     # UI Views (Login, Home, Network, Settings, etc.)
+│   ├── services/                    # API clients and business logic (Auth, TrustScore, Networks, etc.)
+│   ├── theme/                       # App colors, styles, and typography mappings
+│   └── widgets/                     # Reusable UI components
+├── backend/                         # Rust Server Code
+│   ├── Cargo.toml                   # Dependencies (actix-web, sqlx, bcrypt, etc.)
+│   └── src/                         # Source files handling routing, auth, and database queries
+├── serve_web.dart                   # Custom Dart proxy server for web
+└── pubspec.yaml                     # Flutter package dependencies
+```
+
 ## Running the Application
 
 Because of the architectural split, the backend and frontend run as parallel processes. For this deployment, we utilize a mocked backend via `serve_web.dart` to simulate the API interactions and host the Web App.
@@ -58,6 +76,11 @@ Because of the architectural split, the backend and frontend run as parallel pro
 > **Demo Access:** 
 > You can try out the application using the pre-seeded demo account:
 > **Email:** `demo@trustos.app`  |  **Password:** `demo1234`
+
+## Configuration and Tooling
+
+- **Flutter Dependencies**: `http`, `shared_preferences`, `flutter_local_notifications`, `cupertino_icons`
+- **Rust Dependencies**: `actix-web`, `sqlx` (PostgreSQL), `bcrypt`, `serde`, `uuid`
 
 ## SOLID & Code Health Principles
 
