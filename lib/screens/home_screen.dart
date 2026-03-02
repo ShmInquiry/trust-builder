@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/request_service.dart';
 import '../services/mock_data.dart';
 import '../models/request_model.dart';
 import '../widgets/request_card.dart';
@@ -24,12 +24,13 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _loadRequests() async {
-    final requests = await ApiService().getRequests();
-    if (!mounted) return;
-    setState(() {
-      _requests = requests;
-      _isLoading = false;
-    });
+    final requests = await RequestService().getRequests();
+    if (mounted) {
+      setState(() {
+        _requests = requests;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _openCreateRequest() async {

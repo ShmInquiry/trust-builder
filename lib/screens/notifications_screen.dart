@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/notification_service.dart';
-import '../services/api_service.dart';
+import '../services/request_service.dart';
 import '../models/request_model.dart';
 
 class NotificationsScreen extends StatefulWidget {
@@ -32,18 +32,19 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     final hour = await service.scheduledHour;
     final minute = await service.scheduledMinute;
     final filters = await service.getTaskFilters();
-    final requests = await ApiService().getRequests();
+    final requests = await RequestService().getRequests();
 
-    if (!mounted) return;
-    setState(() {
-      _enabled = enabled;
-      _scheduledTime = TimeOfDay(hour: hour, minute: minute);
-      _fairEnabled = filters['fair'] ?? false;
-      _stalledEnabled = filters['stalled'] ?? true;
-      _criticalEnabled = filters['critical'] ?? true;
-      _requests = requests;
-      _isLoading = false;
-    });
+    if (mounted) {
+      setState(() {
+        _enabled = enabled;
+        _scheduledTime = TimeOfDay(hour: hour, minute: minute);
+        _fairEnabled = filters['fair'] ?? false;
+        _stalledEnabled = filters['stalled'] ?? true;
+        _criticalEnabled = filters['critical'] ?? true;
+        _requests = requests;
+        _isLoading = false;
+      });
+    }
   }
 
   Future<void> _saveFilters() async {
@@ -80,14 +81,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
       body: 'You have active requests ($typeStr). Review them to maintain your trust score!',
     );
 
-    if (!mounted) return;
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Test notification sent!'),
-        behavior: SnackBarBehavior.floating,
-        duration: Duration(seconds: 2),
-      ),
-    );
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Test notification sent!'),
+          behavior: SnackBarBehavior.floating,
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
   }
 
   int _getRequestCount(RequestStatus status) {

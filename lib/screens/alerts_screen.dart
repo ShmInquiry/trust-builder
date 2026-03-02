@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/alert_model.dart';
-import '../services/api_service.dart';
+import '../services/alerts_service.dart';
 
 class AlertsScreen extends StatefulWidget {
   const AlertsScreen({super.key});
@@ -24,12 +24,13 @@ class _AlertsScreenState extends State<AlertsScreen> {
   Future<void> _loadAlerts() async {
     setState(() => _isLoading = true);
     final filter = _selectedFilter == 'All' ? null : _selectedFilter;
-    final alerts = await ApiService().getAlerts(filter: filter);
-    if (!mounted) return;
-    setState(() {
-      _alerts = alerts;
-      _isLoading = false;
-    });
+    final alerts = await AlertsService().getAlerts(filter: filter);
+    if (mounted) {
+      setState(() {
+        _alerts = alerts;
+        _isLoading = false;
+      });
+    }
   }
 
   @override

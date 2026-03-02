@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/trust_score_service.dart';
+import '../services/request_service.dart';
+import '../services/network_service.dart';
 import '../models/request_model.dart';
 
 class ReportsScreen extends StatefulWidget {
@@ -30,9 +32,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
   Future<void> _loadData() async {
     setState(() => _loading = true);
     try {
-      final trustData = await ApiService().getTrustScore();
-      final requests = await ApiService().getRequests();
-      final peers = await ApiService().getNetworkPeers();
+      final trustData = await TrustScoreService().getTrustScore();
+      final requests = await RequestService().getRequests();
+      final peers = await NetworkService().getNetworkPeers();
 
       int fair = 0, stalled = 0, critical = 0, completed = 0;
       for (final r in requests) {
