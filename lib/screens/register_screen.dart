@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/auth_service.dart';
 import 'main_shell.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -34,10 +34,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (value.trim().length < 3) {
       return 'Username must be at least 3 characters';
     }
-    if (!RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(value.trim())) {
-      return 'Only letters, numbers, dots, and underscores allowed';
+    if (RegExp(r'^[a-zA-Z0-9._]+$').hasMatch(value.trim())) {
+      return null;
     }
-    return null;
+    return 'Only letters, numbers, dots, and underscores allowed';
   }
 
   String? _validateEmail(String? value) {
@@ -45,10 +45,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return 'Email is required';
     }
     final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (!emailRegex.hasMatch(value.trim())) {
-      return 'Please enter a valid email address';
+    if (emailRegex.hasMatch(value.trim())) {
+      return null;
     }
-    return null;
+    return 'Please enter a valid email address';
   }
 
   String? _validatePassword(String? value) {
@@ -58,10 +58,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (value.length < 8) {
       return 'Password must be at least 8 characters';
     }
-    if (!RegExp(r'[0-9]').hasMatch(value)) {
-      return 'Password must include at least one number';
+    if (RegExp(r'[0-9]').hasMatch(value)) {
+      return null;
     }
-    return null;
+    return 'Password must include at least one number';
   }
 
   Future<void> _createAccount() async {
@@ -69,35 +69,32 @@ class _RegisterScreenState extends State<RegisterScreen> {
       _errorMessage = null;
     });
 
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
-
-    setState(() {
-      _isLoading = true;
-    });
-
-    final username = _usernameController.text.trim();
-    final email = _emailController.text.trim();
-    final password = _passwordController.text;
-
-    final result = await ApiService().register(username, email, password);
-
-    if (!mounted) return;
-
-    if (!result.success) {
+    if (_formKey.currentState!.validate()) {
       setState(() {
-        _isLoading = false;
-        _errorMessage = result.error ?? 'Registration failed. Please try again.';
+        _isLoading = true;
       });
-      return;
-    }
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainShell()),
-      (route) => false,
-    );
+      final username = _usernameController.text.trim();
+      final email = _emailController.text.trim();
+      final password = _passwordController.text;
+
+      final result = await AuthService().register(username, email, password);
+
+      if (mounted) {
+        if (result.success) {
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (_) => const MainShell()),
+            (route) => false,
+          );
+        } else {
+          setState(() {
+            _isLoading = false;
+            _errorMessage = result.error ?? 'Registration failed. Please try again.';
+          });
+        }
+      }
+    }
   }
 
   @override

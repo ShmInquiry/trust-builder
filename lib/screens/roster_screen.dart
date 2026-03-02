@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/network_service.dart';
 import '../models/network_node_model.dart';
 
 class RosterScreen extends StatefulWidget {
@@ -21,12 +21,13 @@ class _RosterScreenState extends State<RosterScreen> {
   }
 
   Future<void> _loadPeers() async {
-    final nodes = await ApiService().getNetworkPeers();
-    if (!mounted) return;
-    setState(() {
-      _peers = nodes.where((n) => n.id != 'you').toList();
-      _isLoading = false;
-    });
+    final nodes = await NetworkService().getNetworkPeers();
+    if (mounted) {
+      setState(() {
+        _peers = nodes.where((n) => n.id != 'you').toList();
+        _isLoading = false;
+      });
+    }
   }
 
   @override

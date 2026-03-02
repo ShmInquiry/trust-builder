@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/network_service.dart';
 import '../models/network_node_model.dart';
 
 class NetworkScreen extends StatefulWidget {
@@ -23,12 +23,13 @@ class _NetworkScreenState extends State<NetworkScreen> {
   }
 
   Future<void> _loadNodes() async {
-    final nodes = await ApiService().getNetworkPeers();
-    if (!mounted) return;
-    setState(() {
-      _nodes = nodes;
-      _isLoading = false;
-    });
+    final nodes = await NetworkService().getNetworkPeers();
+    if (mounted) {
+      setState(() {
+        _nodes = nodes;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
