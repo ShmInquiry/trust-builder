@@ -77,11 +77,6 @@ Because of the architectural split, the backend and frontend run as parallel pro
 > You can try out the application using the pre-seeded demo account:
 > **Email:** `demo@trustos.app`  |  **Password:** `demo1234`
 
-## Configuration and Tooling
-
-- **Flutter Dependencies**: `http`, `shared_preferences`, `flutter_local_notifications`, `cupertino_icons`
-- **Rust Dependencies**: `actix-web`, `sqlx` (PostgreSQL), `bcrypt`, `serde`, `uuid`
-
 ## SOLID & Code Health Principles
 
 The codebase favors positive logic over negative conditionals (avoiding `if (!...)` constructs where appropriate). Core business requirements—such as ApiService interactions—have been rigorously refactored into domain-isolated modules (`AuthService`, `TrustScoreService`, `NetworkService`, etc.) to adhere to single-responsibility (SOLID) principles.
