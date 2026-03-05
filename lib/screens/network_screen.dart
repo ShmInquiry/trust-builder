@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/network_service.dart';
 import '../models/network_node_model.dart';
+import 'user_profile_screen.dart';
 
 class NetworkScreen extends StatefulWidget {
   const NetworkScreen({super.key});
@@ -23,12 +24,13 @@ class _NetworkScreenState extends State<NetworkScreen> {
   }
 
   Future<void> _loadNodes() async {
-    final nodes = await ApiService().getNetworkPeers();
-    if (!mounted) return;
-    setState(() {
-      _nodes = nodes;
-      _isLoading = false;
-    });
+    final nodes = await NetworkService().getNetworkPeers();
+    if (mounted) {
+      setState(() {
+        _nodes = nodes;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -99,7 +101,7 @@ class _NetworkScreenState extends State<NetworkScreen> {
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color: isYou
-                                      ? AppTheme.primaryBlue.withValues(alpha: 0.15)
+                                      ? AppTheme.primaryBlue.withOpacity(0.15)
                                       : AppTheme.backgroundGrey,
                                   border: Border.all(
                                     color: isSelected
@@ -146,56 +148,76 @@ class _NetworkScreenState extends State<NetworkScreen> {
             ),
           ),
         ),
-        if (selectedNode != null && selectedNode.trustLevel != null)
+        if (selectedNode != null && selectedNode.trustLevel != null && selectedNode.id != 'you')
           Positioned(
             top: 16,
             right: 16,
-            child: Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: AppTheme.borderLight),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.08),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => UserProfileScreen(user: selectedNode),
                   ),
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    selectedNode.name,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                      color: AppTheme.textDark,
+                );
+              },
+              child: Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  border: Border.all(color: AppTheme.borderLight),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
                     ),
-                  ),
-                  Text(
-                    selectedNode.role,
-                    style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                  ),
-                  const SizedBox(height: 4),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: AppTheme.statusHealthy.withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
+                  ],
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          selectedNode.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                        Text(
+                          selectedNode.role,
+                          style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppTheme.statusHealthy.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            selectedNode.trustLevel!,
+                            style: const TextStyle(
+                              color: AppTheme.statusHealthy,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    child: Text(
-                      selectedNode.trustLevel!,
-                      style: const TextStyle(
-                        color: AppTheme.statusHealthy,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+                    const SizedBox(width: 8),
+                    const RotatedBox(
+                      quarterTurns: 0,
+                      child: Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 24),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

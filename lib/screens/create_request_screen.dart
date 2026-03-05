@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
-import '../services/api_service.dart';
+import '../services/request_service.dart';
+import '../services/network_service.dart';
 import '../models/network_node_model.dart';
 
 class CreateRequestScreen extends StatefulWidget {
@@ -34,44 +35,45 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
   }
 
   Future<void> _loadPeers() async {
-    final peers = await ApiService().getNetworkPeers();
-    if (!mounted) return;
-    setState(() {
-      _availablePeers = peers.where((p) => p.id != 'you').toList();
-      _isLoadingPeers = false;
-    });
+    final peers = await NetworkService().getNetworkPeers();
+    if (mounted) {
+      setState(() {
+        _availablePeers = peers.where((p) => p.id != 'you').toList();
+        _isLoadingPeers = false;
+      });
+    }
   }
 
   Future<void> _submitRequest() async {
-    if (!_formKey.currentState!.validate()) return;
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isSubmitting = true);
 
-    setState(() => _isSubmitting = true);
-
-    final result = await ApiService().createRequest(
-      title: _titleController.text.trim(),
-      description: _descriptionController.text.trim(),
-      status: _urgency,
-      peers: _selectedPeers.isNotEmpty ? _selectedPeers : null,
-    );
-
-    if (!mounted) return;
-
-    if (result.success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Request created successfully'),
-          backgroundColor: AppTheme.statusHealthy,
-        ),
+      final result = await RequestService().createRequest(
+        title: _titleController.text.trim(),
+        description: _descriptionController.text.trim(),
+        status: _urgency,
+        peers: _selectedPeers.isNotEmpty ? _selectedPeers : null,
       );
-      Navigator.of(context).pop(true);
-    } else {
-      setState(() => _isSubmitting = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(result.error ?? 'Failed to create request'),
-          backgroundColor: AppTheme.statusCritical,
-        ),
-      );
+
+      if (mounted) {
+        if (result.success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Request created successfully'),
+              backgroundColor: AppTheme.statusHealthy,
+            ),
+          );
+          Navigator.of(context).pop(true);
+        } else {
+          setState(() => _isSubmitting = false);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(result.error ?? 'Failed to create request'),
+              backgroundColor: AppTheme.statusCritical,
+            ),
+          );
+        }
+      }
     }
   }
 

@@ -24,12 +24,13 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
 
   Future<void> _confirm() async {
     await LocalStorageService.setLoggedIn(true);
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (_) => const MainShell()),
-      (route) => false,
-    );
+    if (mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => const MainShell()),
+        (route) => false,
+      );
+    }
   }
 
   @override
@@ -134,7 +135,7 @@ class _VerifyEmailScreenState extends State<VerifyEmailScreen> {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: AppTheme.primaryBlue.withValues(alpha: 0.08),
+                  color: AppTheme.primaryBlue.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: const Row(
