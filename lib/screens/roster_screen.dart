@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/network_service.dart';
 import '../models/network_node_model.dart';
+import 'user_profile_screen.dart';
 
 class RosterScreen extends StatefulWidget {
   const RosterScreen({super.key});
@@ -48,69 +49,79 @@ class _RosterScreenState extends State<RosterScreen> {
         separatorBuilder: (_, __) => const SizedBox(height: 1),
         itemBuilder: (context, index) {
           final peer = _peers[index];
-          return Container(
-            padding: const EdgeInsets.all(14),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: index < _peers.length - 1
-                  ? const Border(bottom: BorderSide(color: AppTheme.borderLight))
-                  : null,
-              borderRadius: index == 0
-                  ? const BorderRadius.vertical(top: Radius.circular(12))
-                  : index == _peers.length - 1
-                      ? const BorderRadius.vertical(bottom: Radius.circular(12))
-                      : null,
-            ),
-            child: Row(
-              children: [
-                Container(
-                  width: 42,
-                  height: 42,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.1),
-                  ),
-                  child: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 22),
+          return GestureDetector(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => UserProfileScreen(user: peer),
                 ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        peer.name,
-                        style: const TextStyle(
-                          fontSize: 15,
+              );
+            },
+            child: Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                border: index < _peers.length - 1
+                    ? const Border(bottom: BorderSide(color: AppTheme.borderLight))
+                    : null,
+                borderRadius: index == 0
+                    ? const BorderRadius.vertical(top: Radius.circular(12))
+                    : index == _peers.length - 1
+                        ? const BorderRadius.vertical(bottom: Radius.circular(12))
+                        : null,
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: AppTheme.primaryBlue.withOpacity(0.1),
+                    ),
+                    child: const Icon(Icons.person, color: AppTheme.primaryBlue, size: 22),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          peer.name,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            color: AppTheme.textDark,
+                          ),
+                        ),
+                        Text(
+                          peer.role,
+                          style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
+                        ),
+                      ],
+                    ),
+                  ),
+                  if (peer.trustLevel != null)
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: _trustLevelColor(peer.trustLevel!).withOpacity(0.12),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        peer.trustLevel!,
+                        style: TextStyle(
+                          color: _trustLevelColor(peer.trustLevel!),
+                          fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: AppTheme.textDark,
                         ),
                       ),
-                      Text(
-                        peer.role,
-                        style: const TextStyle(fontSize: 13, color: AppTheme.textMuted),
-                      ),
-                    ],
-                  ),
-                ),
-                if (peer.trustLevel != null)
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: _trustLevelColor(peer.trustLevel!).withValues(alpha: 0.12),
-                      borderRadius: BorderRadius.circular(8),
                     ),
-                    child: Text(
-                      peer.trustLevel!,
-                      style: TextStyle(
-                        color: _trustLevelColor(peer.trustLevel!),
-                        fontSize: 11,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                const SizedBox(width: 8),
-                const Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 20),
-              ],
+                  const SizedBox(width: 8),
+                  const Icon(Icons.chevron_right, color: AppTheme.textMuted, size: 20),
+                ],
+              ),
             ),
           );
         },

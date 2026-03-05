@@ -119,7 +119,7 @@ class _MainShellState extends State<MainShell> {
               margin: const EdgeInsets.only(right: 16),
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _trustStatusColor.withValues(alpha: 0.12),
+                color: _trustStatusColor.withOpacity(0.12),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
