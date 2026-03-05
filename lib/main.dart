@@ -30,7 +30,7 @@ class _TrustOSAppState extends State<TrustOSApp> {
   Future<void> _initSession() async {
     final restored = await AuthService().restoreSession();
     setState(() {
-      _home = restored ? const MainShell() : const LoginScreen();
+      _home = restored ? MainShell() : LoginScreen();
     });
   }
 

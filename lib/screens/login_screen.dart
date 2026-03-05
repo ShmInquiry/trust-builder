@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     padding: const EdgeInsets.all(12),
                     margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
-                      color: AppTheme.statusCritical.withValues(alpha: 0.1),
+                      color: AppTheme.statusCritical.withOpacity(0.1),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Row(
@@ -190,7 +190,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   alignment: Alignment.centerRight,
                   child: Text(
                     'Demo: demo@trustos.app / demo1234',
-                    style: TextStyle(fontSize: 12, color: AppTheme.textMuted.withValues(alpha: 0.7)),
+                    style: TextStyle(fontSize: 12, color: AppTheme.textMuted.withOpacity(0.7)),
                   ),
                 ),
                 const SizedBox(height: 20),

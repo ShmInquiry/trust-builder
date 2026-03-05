@@ -41,7 +41,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   height: 64,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                    color: AppTheme.primaryBlue.withOpacity(0.1),
                   ),
                   child: const Icon(Icons.person, size: 32, color: AppTheme.primaryBlue),
                 ),

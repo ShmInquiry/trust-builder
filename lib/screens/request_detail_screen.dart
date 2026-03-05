@@ -21,11 +21,11 @@ class RequestDetailScreen extends StatelessWidget {
   Color get _statusBgColor {
     switch (request.status) {
       case RequestStatus.fair:
-        return AppTheme.statusFair.withValues(alpha: 0.1);
+        return AppTheme.statusFair.withOpacity(0.1);
       case RequestStatus.stalled:
-        return AppTheme.statusStalled.withValues(alpha: 0.1);
+        return AppTheme.statusStalled.withOpacity(0.1);
       case RequestStatus.critical:
-        return AppTheme.statusCritical.withValues(alpha: 0.1);
+        return AppTheme.statusCritical.withOpacity(0.1);
     }
   }
 
@@ -185,7 +185,7 @@ class RequestDetailScreen extends StatelessWidget {
                           children: [
                             CircleAvatar(
                               radius: 16,
-                              backgroundColor: AppTheme.primaryBlue.withValues(alpha: 0.1),
+                              backgroundColor: AppTheme.primaryBlue.withOpacity(0.1),
                               child: Text(
                                 peer[0].toUpperCase(),
                                 style: const TextStyle(

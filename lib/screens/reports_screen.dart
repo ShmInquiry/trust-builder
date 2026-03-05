@@ -146,9 +146,9 @@ class _ReportsScreenState extends State<ReportsScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: AppTheme.primaryBlue.withValues(alpha: 0.05),
+        color: AppTheme.primaryBlue.withOpacity(0.05),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: AppTheme.primaryBlue.withValues(alpha: 0.15)),
+        border: Border.all(color: AppTheme.primaryBlue.withOpacity(0.15)),
       ),
       child: Column(
         children: [
@@ -174,7 +174,7 @@ class _ReportsScreenState extends State<ReportsScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
             decoration: BoxDecoration(
-              color: healthColor.withValues(alpha: 0.1),
+              color: healthColor.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
