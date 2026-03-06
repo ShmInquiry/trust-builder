@@ -79,3 +79,13 @@
   - Network Node connections are cached in a local database.
   - If the device goes offline, the user can still view their previously loaded Home Screen and Roster.
   - Local data syncs seamlessly with the remote database once the connection is restored.
+
+## 9. Network Map and User Profiles
+
+**File Evidence:** `userstories-network-map-evidence.png`
+
+- **User Story:** As a user, I want to see a visual, interactive map of my trusted network and access detailed user profiles, so that I can understand my relationships and the trust dynamics within my organization.
+- **Acceptance Criteria:**
+  - Interactive network node map displays the root user and their connections.
+  - Tapping on a node or list item in the Roster opens a full-screen User Profile displaying interaction statistics.
+  - The graph handles missing references securely and never incorrectly renders identical overlapping primary nodes.
