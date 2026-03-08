@@ -141,27 +141,19 @@ async function delay(time) {
         await page.screenshot({ path: getPath('evidence-settings-screen.png') });
         console.log('Saved evidence-settings-screen.png');
 
-        console.log('8. Capturing evidence-notification-configure.png & evidence-notification-alert.png...');
+        console.log('8. Capturing userstories-notifications-evidence.png...');
         // Open drawer again to go to Notifications
         await page.mouse.click(25, 50);
         await delay(1000);
-        await page.mouse.click(100, 420); // Guess coord
+        await page.mouse.click(100, 520); // Notifications is further down
         await delay(1000);
 
-        await page.screenshot({ path: getPath('evidence-notification-configure.png') });
-        console.log('Saved evidence-notification-configure.png');
-
-        // Click Test Notification Button
-        await page.mouse.click(200, 300); // Guess coord for test notification button
-        await delay(1000); // Wait for snackbar
-        await page.screenshot({ path: getPath('evidence-notification-alert.png') });
-        console.log('Saved evidence-notification-alert.png');
+        await page.screenshot({ path: getPath('userstories-notifications-evidence.png') });
+        console.log('Saved userstories-notifications-evidence.png');
 
         console.log('9. Capturing evidence-detail-screen.png...');
-        // Go Home
+        // Go Home via Back Button
         await page.mouse.click(25, 50);
-        await delay(1000);
-        await page.mouse.click(100, 150); // Guess Home coord
         await delay(1000);
 
         // Click on the first request card (usually found in middle of screen)
@@ -170,13 +162,24 @@ async function delay(time) {
         await page.screenshot({ path: getPath('evidence-detail-screen.png') });
         console.log('Saved evidence-detail-screen.png');
 
-        console.log('10. Capturing evidence-api-ux.png...');
-        // Go to Alerts or Network via Bottom Nav
-        // Bottom nav bar typically at y=750 for 800h screen. Alerts might be 4th icon
-        await page.mouse.click(300, 750); // Network/Alerts click
+        console.log('10. Capturing userStories-externalAPI-evidence.png (Alerts Feed)...');
+        // Back to Home via Back Button
+        await page.mouse.click(25, 50);
+        await delay(1000);
+
+        // Go to Alerts via Bottom Nav
+        // Bottom nav bar at y=750 for 800h screen. Alerts is 4th icon
+        await page.mouse.click(350, 750); // Alerts click
         await delay(1500);
-        await page.screenshot({ path: getPath('evidence-api-ux.png') });
-        console.log('Saved evidence-api-ux.png');
+        await page.screenshot({ path: getPath('userStories-externalAPI-evidence.png') });
+        console.log('Saved userStories-externalAPI-evidence.png');
+
+        console.log('11. Capturing userstories-network-map-evidence.png...');
+        // Go to Network via Bottom Nav (2nd item)
+        await page.mouse.click(150, 750); // Network click
+        await delay(1500);
+        await page.screenshot({ path: getPath('userstories-network-map-evidence.png') });
+        console.log('Saved userstories-network-map-evidence.png');
 
         console.log('Successfully captured all required screenshots!');
 
