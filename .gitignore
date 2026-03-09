@@ -77,3 +77,6 @@ backend/target/
 !**/ios/**/default.pbxuser
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
+
+# Local iOS build caching
+ios/Flutter/flutter_export_environment.sh
