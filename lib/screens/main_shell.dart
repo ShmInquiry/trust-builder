@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Settings Menu
+/// This file is responsible for the Settings Menu implementation.
+/// It defines the slide-out navigation Drawer and orchestrates the primary routing layout.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/trust_score_service.dart';

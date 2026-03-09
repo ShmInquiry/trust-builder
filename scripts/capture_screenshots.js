@@ -55,12 +55,18 @@ async function delay(time) {
         console.log('Saved login_error.png');
 
         console.log('2. Capturing signup_error.png...');
-        // Click "Sign up" link (Approx 200, 520)
-        await page.mouse.click(200, 520);
-        await delay(1000);
+        // Sweep y-axis to guarantee hit on the "Don't have an account? Sign Up" text link
+        for (let burstY = 500; burstY <= 650; burstY += 20) {
+            await page.mouse.click(200, burstY);
+            await delay(100);
+        }
+        await delay(2000); // Wait for Registration screen to animate in
 
-        // Click register with empty fields (Register button Approx 200, 470)
-        await page.mouse.click(200, 470);
+        // Click register with empty fields (Sweeping the Register button as well around roughly Y=550 to Y=650)
+        for (let burstY = 500; burstY <= 650; burstY += 20) {
+            await page.mouse.click(200, burstY);
+            await delay(100);
+        }
         await delay(1000);
         await page.screenshot({ path: getPath('signup_error.png') });
         console.log('Saved signup_error.png');
@@ -88,43 +94,41 @@ async function delay(time) {
         await page.waitForSelector('span', { text: 'Demo User', timeout: 5000 }).catch(() => console.log("Could not find demo user span"));
         await delay(2000); // Additional buffer for screen transition and animation
 
-        console.log('4. Capturing evidence-persistence.png & evidence-integrateScreen-persistence.png...');
-        // Take screenshot of the screen showing persistent user data
-        await page.screenshot({ path: getPath('evidence-integrateScreen-persistence.png') });
-        console.log('Saved evidence-integrateScreen-persistence.png');
-
+        console.log('4. Capturing evidence-integrateScreen-persistence.png...');
         // Evaluate and get LocalStorage
         const localStorageData = await page.evaluate(() => JSON.stringify(window.localStorage, null, 2));
-        // To visualize local storage, we will inject a div over the screen containing the data and screenshot it
+
+        // To visualize local storage simultaneously with the front end UI per the rubric, 
+        // we will inject a partial translucent div over the screen containing the data and screenshot it together
         await page.evaluate((ls) => {
             const div = document.createElement('div');
             div.style.position = 'absolute';
-            div.style.top = '0';
-            div.style.left = '0';
-            div.style.width = '100%';
-            div.style.height = '100%';
+            div.style.bottom = '50px';
+            div.style.left = '10px';
+            div.style.width = '380px';
+            div.style.height = '400px';
+            div.style.overflow = 'hidden';
             div.style.backgroundColor = 'rgba(0,0,0,0.85)';
             div.style.color = 'lime';
             div.style.zIndex = '99999';
-            div.style.padding = '20px';
+            div.style.padding = '10px';
+            div.style.fontSize = '12px';
             div.style.whiteSpace = 'pre-wrap';
-            div.innerText = "LocalStorage Data:\n\n" + ls;
+            div.innerText = "LOCAL STORAGE DUMP:\n" + ls;
             document.body.appendChild(div);
             div.id = 'debug-overlay';
         }, localStorageData);
-        await page.screenshot({ path: getPath('evidence-persistence.png') });
-        console.log('Saved evidence-persistence.png');
+        await delay(500);
+        await page.screenshot({ path: getPath('evidence-integrateScreen-persistence.png') });
+        console.log('Saved evidence-integrateScreen-persistence.png');
 
         // Remove the overlay
         await page.evaluate(() => document.getElementById('debug-overlay').remove());
 
-        console.log('5. Capturing evidence-menu-icon.png...');
-        // Capture the top part with drawer icon
-        await page.screenshot({
-            path: getPath('evidence-menu-icon.png'),
-            clip: { x: 0, y: 0, width: 400, height: 100 }
-        });
-        console.log('Saved evidence-menu-icon.png');
+        console.log('5. Capturing evidence-detail-navigation.png...');
+        // Capture the full screen showing the navigation menu icon ("hamburger" menu on top left)
+        await page.screenshot({ path: getPath('evidence-detail-navigation.png') });
+        console.log('Saved evidence-detail-navigation.png');
 
         console.log('6. Capturing evidence-menu-items.png...');
         // Click Drawer Icon (usually the first icon button on the top left App bar)
@@ -151,28 +155,49 @@ async function delay(time) {
         await page.screenshot({ path: getPath('userstories-notifications-evidence.png') });
         console.log('Saved userstories-notifications-evidence.png');
 
-        console.log('9. Capturing evidence-detail-screen.png...');
-        // Go Home via Back Button
-        await page.mouse.click(25, 50);
+        await page.screenshot({ path: getPath('evidence-notification-configure.png') });
+        console.log('Saved evidence-notification-configure.png');
+
+        // Toggle the Notifications switch ON (it defaults to off, which disables the button!)
+        // The switch is inside _buildEnableSection near the top, roughly Y=120, X=350
+        await page.mouse.click(350, 120);
         await delay(1000);
 
-        // Click on the first request card (usually found in middle of screen)
-        await page.mouse.click(200, 300);
+        // Click Test Notification Button (Sweep y-axis to guarantee hit without scrolling issues)
+        for (let burstY = 600; burstY <= 780; burstY += 20) {
+            await page.mouse.click(200, burstY);
+            await delay(100);
+        }
+        await delay(2000); // Wait long enough for snackbar animation to complete
+
+        await page.screenshot({ path: getPath('evidence-notification-alert.png') });
+        console.log('Saved evidence-notification-alert.png');
+
+        console.log('9. Capturing evidence-detail-screen.png...');
+        // We are currently in Notifications. Open drawer to go Home.
+        await page.mouse.click(25, 50);
         await delay(1000);
+        await page.mouse.click(100, 150); // Click "Home" in Drawer
+        await delay(2000);
+
+        // Click on the first request card (usually found in middle of screen)
+        await page.mouse.click(200, 350);
+        await delay(1500);
         await page.screenshot({ path: getPath('evidence-detail-screen.png') });
         console.log('Saved evidence-detail-screen.png');
 
-        console.log('10. Capturing userStories-externalAPI-evidence.png (Alerts Feed)...');
-        // Back to Home via Back Button
+        console.log('10. Capturing userStories-externalAPI-evidence.png and evidence-api-ux.png (Alerts Feed)...');
+        // Back to Home via Back Button from Detail Screen
         await page.mouse.click(25, 50);
-        await delay(1000);
+        await delay(1500);
 
         // Go to Alerts via Bottom Nav
         // Bottom nav bar at y=750 for 800h screen. Alerts is 4th icon
         await page.mouse.click(350, 750); // Alerts click
-        await delay(1500);
+        await delay(2000);
         await page.screenshot({ path: getPath('userStories-externalAPI-evidence.png') });
-        console.log('Saved userStories-externalAPI-evidence.png');
+        await page.screenshot({ path: getPath('evidence-api-ux.png') });
+        console.log('Saved userStories-externalAPI-evidence.png and evidence-api-ux.png');
 
         console.log('11. Capturing userstories-network-map-evidence.png...');
         // Go to Network via Bottom Nav (2nd item)

@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: API Integration
+/// This file is responsible for the API integration implementation.
+/// It contains the generic HTTP handlers used to fetch data from the backend Rust API.
+////
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/foundation.dart';
