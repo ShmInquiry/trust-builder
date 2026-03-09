@@ -23,7 +23,6 @@ async function delay(time) {
 (async () => {
     console.log('Launching browser...');
     const browser = await puppeteer.launch({
-        executablePath: '/usr/bin/chromium',
         headless: "new",
         defaultViewport: { width: 400, height: 800 },
         args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-web-security'] // Disabled web security helps if CORS issues happen in testing
