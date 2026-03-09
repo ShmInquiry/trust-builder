@@ -94,38 +94,7 @@ async function delay(time) {
         await page.waitForSelector('span', { text: 'Demo User', timeout: 5000 }).catch(() => console.log("Could not find demo user span"));
         await delay(2000); // Additional buffer for screen transition and animation
 
-        console.log('4. Capturing evidence-integrateScreen-persistence.png...');
-        // Evaluate and get LocalStorage
-        const localStorageData = await page.evaluate(() => JSON.stringify(window.localStorage, null, 2));
-
-        // To visualize local storage simultaneously with the front end UI per the rubric, 
-        // we will inject a partial translucent div over the screen containing the data and screenshot it together
-        await page.evaluate((ls) => {
-            const div = document.createElement('div');
-            div.style.position = 'absolute';
-            div.style.bottom = '50px';
-            div.style.left = '10px';
-            div.style.width = '380px';
-            div.style.height = '400px';
-            div.style.overflow = 'hidden';
-            div.style.backgroundColor = 'rgba(0,0,0,0.85)';
-            div.style.color = 'lime';
-            div.style.zIndex = '99999';
-            div.style.padding = '10px';
-            div.style.fontSize = '12px';
-            div.style.whiteSpace = 'pre-wrap';
-            div.innerText = "LOCAL STORAGE DUMP:\n" + ls;
-            document.body.appendChild(div);
-            div.id = 'debug-overlay';
-        }, localStorageData);
-        await delay(500);
-        await page.screenshot({ path: getPath('evidence-integrateScreen-persistence.png') });
-        console.log('Saved evidence-integrateScreen-persistence.png');
-
-        // Remove the overlay
-        await page.evaluate(() => document.getElementById('debug-overlay').remove());
-
-        console.log('5. Capturing evidence-detail-navigation.png...');
+        console.log('4. Capturing evidence-detail-navigation.png...');
         // Capture the full screen showing the navigation menu icon ("hamburger" menu on top left)
         await page.screenshot({ path: getPath('evidence-detail-navigation.png') });
         console.log('Saved evidence-detail-navigation.png');
@@ -202,9 +171,40 @@ async function delay(time) {
         console.log('11. Capturing userstories-network-map-evidence.png...');
         // Go to Network via Bottom Nav (2nd item)
         await page.mouse.click(150, 750); // Network click
-        await delay(1500);
+        await delay(2000); // Wait for nodes to pop in
         await page.screenshot({ path: getPath('userstories-network-map-evidence.png') });
         console.log('Saved userstories-network-map-evidence.png');
+
+        console.log('12. Capturing evidence-integrateScreen-persistence.png (Network App UI + Local Storage dump)...');
+        // Evaluate and get LocalStorage
+        const localStorageData = await page.evaluate(() => JSON.stringify(window.localStorage, null, 2));
+
+        // To visualize local storage simultaneously with the front end UI per the rubric, 
+        // we will inject a partial translucent div over the screen containing the data and screenshot it together
+        await page.evaluate((ls) => {
+            const div = document.createElement('div');
+            div.style.position = 'absolute';
+            div.style.bottom = '50px';
+            div.style.left = '10px';
+            div.style.width = '380px';
+            div.style.height = '400px';
+            div.style.overflow = 'hidden';
+            div.style.backgroundColor = 'rgba(0,0,0,0.85)';
+            div.style.color = 'lime';
+            div.style.zIndex = '99999';
+            div.style.padding = '10px';
+            div.style.fontSize = '12px';
+            div.style.whiteSpace = 'pre-wrap';
+            div.innerText = "LOCAL STORAGE DUMP:\n" + ls;
+            document.body.appendChild(div);
+            div.id = 'debug-overlay';
+        }, localStorageData);
+        await delay(500);
+        await page.screenshot({ path: getPath('evidence-integrateScreen-persistence.png') });
+        console.log('Saved evidence-integrateScreen-persistence.png');
+
+        // Remove the overlay
+        await page.evaluate(() => document.getElementById('debug-overlay').remove());
 
         console.log('Successfully captured all required screenshots!');
 
