@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Notifications
+/// This file is responsible for where notifications are implemented conceptually in the UI.
+/// It provides the switches to schedule background tasks and register the push notification listeners.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/notification_service.dart';

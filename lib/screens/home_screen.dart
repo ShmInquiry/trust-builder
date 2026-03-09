@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Home Screen
+/// This file is responsible for the Home Screen dashboard implementation.
+/// It aggregates the Trust Counter, the daily quote, and active requests for the user.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/request_service.dart';

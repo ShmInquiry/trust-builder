@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Detail Screen
+/// This file is responsible for the Detail Screen implementation.
+/// It displays the specific, expanded item information regarding an active Expectation Request.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../models/request_model.dart';

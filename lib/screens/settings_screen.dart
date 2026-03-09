@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Settings Screen
+/// This file is responsible for the Settings Screen implementation.
+/// It houses the individual privacy toggles, theme configurations, and data exports functionality.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';

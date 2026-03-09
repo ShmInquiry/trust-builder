@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Local Storage
+/// This file is responsible for traversing the SQLite / SharedPreferences abstraction to achieve persistent local data storage.
+/// It caches recent requests, network maps, and layout settings so the app can load offline.
+////
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LocalStorageService {

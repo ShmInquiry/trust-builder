@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Login
+/// This file is responsible for the user login implementation.
+/// It authenticates users by connecting to the backend via the AuthService and sets the local session token.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';

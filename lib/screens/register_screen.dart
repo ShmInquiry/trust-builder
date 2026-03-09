@@ -1,3 +1,8 @@
+////
+/// FEATURE IMPLEMENTATION: Signup / Registration
+/// This file is responsible for the user registration and signup implementation flow.
+/// It validates email/password input and connects to the AuthService to create the account.
+////
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../services/auth_service.dart';
