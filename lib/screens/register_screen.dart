@@ -255,7 +255,60 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         )
                       : const Text('Create account'),
                 ),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('or sign up with', style: TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+                    ),
+                    Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Tooltip(
+                  message: 'Coming soon',
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.borderLight),
+                      borderRadius: BorderRadius.circular(26),
+                      color: AppTheme.backgroundGrey.withOpacity(0.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.g_mobiledata, color: AppTheme.textMuted, size: 28),
+                        const SizedBox(width: 8),
+                        const Text('Sign up with Google', style: TextStyle(color: AppTheme.textMuted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 12),
+                Tooltip(
+                  message: 'Coming soon',
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.borderLight),
+                      borderRadius: BorderRadius.circular(26),
+                      color: AppTheme.backgroundGrey.withOpacity(0.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.window, color: AppTheme.textMuted, size: 20),
+                        const SizedBox(width: 12),
+                        const Text('Sign up with Microsoft', style: TextStyle(color: AppTheme.textMuted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
                 const Center(
                   child: Text(
                     'By creating an account, you agree to the Terms and Data Policy.',

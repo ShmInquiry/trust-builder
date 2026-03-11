@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'notification_service_web.dart' as web_notif;
 
 class NotificationService {
@@ -28,6 +31,33 @@ class NotificationService {
         }
       } catch (_) {
         _permissionGranted = false;
+      }
+    } else {
+      final messaging = FirebaseMessaging.instance;
+      final settings = await messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      _permissionGranted = settings.authorizationStatus == AuthorizationStatus.authorized;
+
+      if (_permissionGranted) {
+        // Handle foreground messages
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+          // This would ideally integrate with flutter_local_notifications for local display
+          print('Received foreground message: ${message.notification?.title}');
+        });
+
+        // Get the device token for this installation
+        try {
+          final token = await messaging.getToken();
+          print('FCM Device Token: $token');
+          if (token != null) {
+            await _sendTokenToBackend(token);
+          }
+        } catch (e) {
+          print('Failed to get FCM token: $e');
+        }
       }
     }
 
@@ -105,6 +135,27 @@ class NotificationService {
     await prefs.setBool(_keyFairEnabled, fair);
     await prefs.setBool(_keyStalledEnabled, stalled);
     await prefs.setBool(_keyCriticalEnabled, critical);
+
+    if (!kIsWeb) {
+      final messaging = FirebaseMessaging.instance;
+      if (fair) {
+        await messaging.subscribeToTopic('topic_fair');
+      } else {
+        await messaging.unsubscribeFromTopic('topic_fair');
+      }
+      
+      if (stalled) {
+        await messaging.subscribeToTopic('topic_stalled');
+      } else {
+        await messaging.unsubscribeFromTopic('topic_stalled');
+      }
+
+      if (critical) {
+        await messaging.subscribeToTopic('topic_critical');
+      } else {
+        await messaging.unsubscribeFromTopic('topic_critical');
+      }
+    }
   }
 
   Future<Map<String, bool>> getTaskFilters() async {
@@ -113,5 +164,19 @@ class NotificationService {
       'stalled': await stalledEnabled,
       'critical': await criticalEnabled,
     };
+  }
+
+  Future<void> _sendTokenToBackend(String token) async {
+    try {
+      final uri = Uri.parse('http://localhost:5000/api/users/device-token');
+      await http.post(
+        uri,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'device_token': token}),
+      );
+      print('Token successfully registered with backend proxy');
+    } catch (e) {
+      print('Failed to register token with backend: $e');
+    }
   }
 }

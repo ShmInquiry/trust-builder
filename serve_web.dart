@@ -1,5 +1,10 @@
 import 'dart:io';
 import 'dart:convert';
+import 'package:dart_jsonwebtoken/dart_jsonwebtoken.dart';
+import 'package:http/http.dart' as http;
+
+// Simple in-memory storage for the last registered device token
+String? lastDeviceToken;
 
 Future<void> main() async {
   final server = await HttpServer.bind('0.0.0.0', 5000);
@@ -55,8 +60,93 @@ self.addEventListener('activate', function(e) {
   }
 }
 
+Future<String?> _getAccessToken() async {
+  try {
+    final saFile = File('backend/service-account.json');
+    if (!await saFile.exists()) {
+      print('❌ ERROR: backend/service-account.json not found');
+      return null;
+    }
+    final sa = json.decode(await saFile.readAsString());
+
+    final now = DateTime.now().millisecondsSinceEpoch ~/ 1000;
+
+    final jwt = JWT(
+      {
+        'iss': sa['client_email'],
+        'scope': 'https://www.googleapis.com/auth/firebase.messaging',
+        'aud': sa['token_uri'],
+        'exp': now + 3600,
+        'iat': now,
+      },
+    );
+
+    final privateKeyPem = (sa['private_key'] as String).replaceAll('\\n', '\n');
+    final signed = jwt.sign(RSAPrivateKey(privateKeyPem), algorithm: JWTAlgorithm.RS256);
+
+    print('🔑 JWT signed, exchanging for access token...');
+
+    final response = await http.post(
+      Uri.parse(sa['token_uri'] as String),
+      headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+      body: 'grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=$signed',
+    );
+
+    if (response.statusCode == 200) {
+      print('✅ Got OAuth access token.');
+      return json.decode(response.body)['access_token'] as String?;
+    } else {
+      print('❌ ERROR: OAuth token exchange failed (${response.statusCode}): ${response.body}');
+      return null;
+    }
+  } catch (e, st) {
+    print('❌ ERROR: Failed to generate access token: $e\n$st');
+    return null;
+  }
+}
+
+/// Sends an FCM push notification to the last registered device token.
+/// Returns true on success, false on failure.
+Future<bool> _sendFcmNotification({required String title, required String body}) async {
+  if (lastDeviceToken == null) {
+    print('⚠️  No device token registered, skipping notification.');
+    return false;
+  }
+
+  final accessToken = await _getAccessToken();
+  if (accessToken == null) return false;
+
+  final saFile = File('backend/service-account.json');
+  final sa = json.decode(await saFile.readAsString());
+  final projectId = sa['project_id'];
+
+  print('🔔 Dispatching FCM: "$title"');
+
+  final response = await http.post(
+    Uri.parse('https://fcm.googleapis.com/v1/projects/$projectId/messages:send'),
+    headers: {
+      'Authorization': 'Bearer $accessToken',
+      'Content-Type': 'application/json',
+    },
+    body: json.encode({
+      'message': {
+        'token': lastDeviceToken,
+        'notification': {'title': title, 'body': body},
+        'data': {'click_action': 'FLUTTER_NOTIFICATION_CLICK'},
+      }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    print('✅ FCM sent: "$title"');
+    return true;
+  } else {
+    print('❌ FCM failed (${response.statusCode}): ${response.body}');
+    return false;
+  }
+}
+
 Future<void> _proxyToBackend(HttpRequest request) async {
-  // MOCK BACKEND FOR SCREENSHOT CAPTURE (Rust bypass)
   request.response.headers.set('Content-Type', 'application/json');
   request.response.headers.set('Access-Control-Allow-Origin', '*');
   
@@ -68,14 +158,11 @@ Future<void> _proxyToBackend(HttpRequest request) async {
 
   final path = request.uri.path;
   
-  // Fake delay
-  await Future.delayed(Duration(milliseconds: 50));
-
   if (path.contains('/api/auth/login')) {
     final bodyStr = await utf8.decodeStream(request);
-    if (bodyStr.contains('wrong@email.com')) {
+    if (bodyStr.contains('wrong@email.com') || bodyStr.contains('"identifier":"wrong"')) {
       request.response.statusCode = 401;
-      request.response.write(json.encode({'success': false, 'error': 'Invalid email or password. Please try again.'}));
+      request.response.write(json.encode({'success': false, 'error': 'Invalid email/username or password. Please try again.'}));
     } else {
       request.response.statusCode = 200;
       request.response.write(json.encode({
@@ -85,6 +172,11 @@ Future<void> _proxyToBackend(HttpRequest request) async {
           'user': {'id': '1', 'username': 'Demo User', 'email': 'demo@trustos.app', 'trust_score': 850}
         }
       }));
+      // Fire a welcome-back push notification
+      _sendFcmNotification(
+        title: '👋 Welcome back to Trust OS',
+        body: 'You have successfully signed in. Your trust score stands at 850.',
+      ).ignore();
     }
   } else if (path.contains('/api/auth/register')) {
     final bodyStr = await utf8.decodeStream(request);
@@ -100,6 +192,11 @@ Future<void> _proxyToBackend(HttpRequest request) async {
           'user': {'id': '1', 'username': 'Demo User', 'email': 'demo@trustos.app', 'trust_score': 850}
         }
       }));
+      // Fire a welcome push notification for new users
+      _sendFcmNotification(
+        title: '🎉 Welcome to Trust OS!',
+        body: 'Your account is ready. Build your trust network today.',
+      ).ignore();
     }
   } else if (path.contains('/api/trust-score')) {
     request.response.statusCode = 200;
@@ -108,10 +205,11 @@ Future<void> _proxyToBackend(HttpRequest request) async {
       'data': {'score': 850, 'status': 'Healthy', 'last_updated': DateTime.now().toIso8601String()}
     }));
   } else if (path.contains('/api/requests')) {
+    final isPost = request.method == 'POST';
     request.response.statusCode = 200;
     request.response.write(json.encode({
       'success': true,
-      'data': [
+      'data': isPost ? null : [
         {
           'id': '101', 'title': 'Identity Verification', 'description': 'Alice requires identity endorsement on document XYZ.',
           'status': 'Pending'
@@ -122,6 +220,13 @@ Future<void> _proxyToBackend(HttpRequest request) async {
         }
       ]
     }));
+    if (isPost) {
+      // Notify user that their request was submitted
+      _sendFcmNotification(
+        title: '📋 New Trust Request Submitted',
+        body: 'Your trust request has been sent and is awaiting review.',
+      ).ignore();
+    }
   } else if (path.contains('/api/network')) {
     request.response.statusCode = 200;
     request.response.write(json.encode({
@@ -140,6 +245,34 @@ Future<void> _proxyToBackend(HttpRequest request) async {
         {'id': '2', 'title': 'Trust Score Update', 'message': 'Trust score increased by 15 points', 'alert_type': 'system', 'created_at': DateTime.now().subtract(Duration(days: 2)).toIso8601String()}
       ]
     }));
+  } else if (path.contains('/api/users/device-token')) {
+    final bodyStr = await utf8.decodeStream(request);
+    final data = json.decode(bodyStr);
+    lastDeviceToken = data['device_token'];
+    print('✅ SERVER: Registered FCM device token: $lastDeviceToken');
+    request.response.statusCode = 200;
+    request.response.write(json.encode({'success': true, 'message': 'Token registered successfully.'}));
+  } else if (path.contains('/api/notifications/send')) {
+    // Allow optional body to override title/body
+    String title = 'Trust OS Notification';
+    String body = 'You have a new update in Trust OS.';
+    try {
+      final bodyStr = await utf8.decodeStream(request);
+      if (bodyStr.isNotEmpty) {
+        final data = json.decode(bodyStr);
+        if (data['title'] != null) title = data['title'];
+        if (data['body'] != null) body = data['body'];
+      }
+    } catch (_) {}
+
+    final ok = await _sendFcmNotification(title: title, body: body);
+    if (ok) {
+      request.response.statusCode = 200;
+      request.response.write(json.encode({'success': true, 'message': 'Real FCM notification sent.'}));
+    } else {
+      request.response.statusCode = 500;
+      request.response.write(json.encode({'success': false, 'error': 'FCM dispatch failed. Check server logs.'}));
+    }
   } else {
     request.response.statusCode = 404;
     request.response.write(json.encode({'success': false, 'error': 'Mock route not found'}));

@@ -31,15 +31,22 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  String? _validateEmail(String? value) {
+  String? _validateIdentifier(String? value) {
     if (value == null || value.trim().isEmpty) {
-      return 'Email is required';
+      return 'Email or username is required';
     }
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-    if (emailRegex.hasMatch(value.trim())) {
-      return null;
+    final text = value.trim();
+    if (text.contains('@')) {
+      final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+      if (!emailRegex.hasMatch(text)) {
+        return 'Please enter a valid email address';
+      }
+    } else {
+      if (text.length < 3) {
+        return 'Username must be at least 3 characters';
+      }
     }
-    return 'Please enter a valid email address';
+    return null;
   }
 
   String? _validatePassword(String? value) {
@@ -156,15 +163,14 @@ class _LoginScreenState extends State<LoginScreen> {
                       ],
                     ),
                   ),
-                const Text('Email', style: TextStyle(fontSize: 14, color: AppTheme.textDark, fontWeight: FontWeight.w500)),
+                const Text('Email or Username', style: TextStyle(fontSize: 14, color: AppTheme.textDark, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 6),
                 TextFormField(
                   controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: _validateEmail,
+                  validator: _validateIdentifier,
                   autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: const InputDecoration(
-                    hintText: 'you@company.com',
+                    hintText: 'Email or username',
                   ),
                 ),
                 const SizedBox(height: 20),
@@ -212,7 +218,60 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                       : const Text('Sign in'),
                 ),
-                const SizedBox(height: 20),
+                const SizedBox(height: 32),
+                Row(
+                  children: [
+                    Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                    const Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      child: Text('or continue with', style: TextStyle(color: AppTheme.textMuted, fontSize: 13)),
+                    ),
+                    Expanded(child: Container(height: 1, color: AppTheme.borderLight)),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Tooltip(
+                  message: 'Coming soon',
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.borderLight),
+                      borderRadius: BorderRadius.circular(26),
+                      color: AppTheme.backgroundGrey.withOpacity(0.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.g_mobiledata, color: AppTheme.textMuted, size: 28),
+                        const SizedBox(width: 8),
+                        const Text('Sign in with Google', style: TextStyle(color: AppTheme.textMuted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Tooltip(
+                  message: 'Coming soon',
+                  child: Container(
+                    width: double.infinity,
+                    height: 52,
+                    decoration: BoxDecoration(
+                      border: Border.all(color: AppTheme.borderLight),
+                      borderRadius: BorderRadius.circular(26),
+                      color: AppTheme.backgroundGrey.withOpacity(0.5),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.window, color: AppTheme.textMuted, size: 20),
+                        const SizedBox(width: 12),
+                        const Text('Sign in with Microsoft', style: TextStyle(color: AppTheme.textMuted, fontSize: 15, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 32),
                 Center(
                   child: GestureDetector(
                     onTap: () {

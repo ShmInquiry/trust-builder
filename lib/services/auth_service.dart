@@ -22,9 +22,9 @@ class AuthService {
     return true;
   }
 
-  Future<({bool success, String? error})> login(String emailInput, String password) async {
+  Future<({bool success, String? error})> login(String identifier, String password) async {
     final result = await ApiClient().request('POST', '/api/auth/login', body: {
-      'email': emailInput,
+      'identifier': identifier,
       'password': password,
     });
 
